@@ -1,0 +1,82 @@
+import React, { useState } from "react";
+import AdminSidebar from './AdminSidebar';
+import CategoryManager from './AdminComponents/CategoryManager';
+import AdminDashboard from './AdminComponents/AdminDashboard';
+import DepartmentManager from './AdminComponents/DepartmentManager';
+import KnowledgeBaseManager from './AdminComponents/KnowledgeBaseManager';
+import UserManager from './AdminComponents/UserManager';
+
+const AdminPanel = () => {
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Admin Sidebar */}
+      <AdminSidebar
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setIsSidebarOpen(false);
+        }}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Admin Header */}
+        <AdminHeader onMenuClick={() => setIsSidebarOpen(true)} />
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-auto p-6">
+          {activeTab === "dashboard" && <AdminDashboard />}
+          {activeTab === "categories" && <CategoryManager />}
+          {activeTab === "departments" && <DepartmentManager />}
+          {activeTab === "knowledge-base" && <KnowledgeBaseManager />}
+          {activeTab === "users" && <UserManager />}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AdminHeader = ({ onMenuClick }) => {
+  return (
+    <header className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="flex items-center justify-between px-6 py-4">
+        <button
+          onClick={onMenuClick}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors md:hidden"
+        >
+          ☰
+        </button>
+
+        <div className="flex-1 flex items-center gap-2">
+          <img
+            src="/wildcare.jpg"
+            alt="CITU-CARE Logo"
+            className="h-8 w-8 object-contain rounded-full"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">CITU-CARE Admin</h1>
+            <p className="text-sm text-gray-500">Manage your chatbot</p>
+          </div>
+        </div>
+
+        <a
+          href="/"
+          className="px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+        >
+          ← Back to Chat
+        </a>
+      </div>
+    </header>
+  );
+};
+
+export default AdminPanel;

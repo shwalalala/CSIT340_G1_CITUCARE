@@ -108,7 +108,7 @@ const AdminSidebar = ({ activeTab, onTabChange, isOpen, onClose }: AdminSidebarP
             onClick={() => {
               localStorage.removeItem('adminUser');
               localStorage.removeItem('isAdmin');
-              window.location.href = '/';
+              window.location.href = '/admin/login';
             }}
           >
             <LogOut size={20} />

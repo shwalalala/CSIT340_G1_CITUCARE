@@ -1,6 +1,6 @@
 // frontend/src/components/AdminComponents/AdminDashboard.jsx
 import React, { useEffect, useState } from 'react';
-import { Users, MessageSquare, Layers, BookOpen } from 'lucide-react';
+import { Users, Boxes, Layers, BookOpen } from 'lucide-react';
 import chatService from '../../../services/chatService';
 import axios from 'axios';
 
@@ -15,6 +15,8 @@ const [kbTotal, setKbTotal] = useState(null);
 const [kbPublished, setKbPublished] = useState(null);
 const [kbDraft, setKbDraft] = useState(null);
 const [kbRecent, setKbRecent] = useState([]);
+const [departmentsCount, setDepartmentsCount] = useState(null);
+const [departments, setDepartments] = useState([]);
 
 const [adminUser, setAdminUser] = useState(null);
 
@@ -107,6 +109,20 @@ const normalizeKbRow = (row) => ({
       })
       .catch(() => mounted && setConversations(0));
 
+    // departments
+    axios
+      .get(`${API_BASE_URL}/departments`)
+      .then((res) => {
+        if (!mounted) return;
+        const data = res.data;
+        setDepartments(Array.isArray(data) ? data : []);
+        setDepartmentsCount(Array.isArray(data) ? data.length : 0);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch departments:', err);
+        if (mounted) setDepartmentsCount(0);
+      });
+
     // admin users
     axios
       .get(`${API_BASE_URL}/users`)
@@ -173,14 +189,6 @@ const kbPublishedRatio =
 
 const stats = [
     {
-      title: 'Total Conversations',
-      value: conversations == null ? '…' : conversations,
-      subtitle: '+0%',
-      icon: MessageSquare,
-      color: 'bg-red-100',
-      textColor: 'text-red-700',
-    },
-    {
       title: 'Knowledge Base Articles',
       value: kbTotal == null ? '…' : kbTotal,
       subtitle:
@@ -198,6 +206,14 @@ const stats = [
       icon: Layers,
       color: 'bg-amber-50',
       textColor: 'text-amber-600',
+    },
+    {
+    title: 'Departments',
+    value: departmentsCount == null ? '…' : departmentsCount,
+    subtitle: departments.length > 0 ? `${departments.length} total departments` : '',
+    icon: Boxes,
+    color: 'bg-red-100',
+    textColor: 'text-red-700',
     },
     {
       title: 'Admin Users',

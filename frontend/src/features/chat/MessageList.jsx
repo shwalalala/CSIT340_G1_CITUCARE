@@ -1,12 +1,43 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 const MessageList = ({ messages, isLoading }) => {
+  
+  const containerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (containerRef.current) {
+      const shouldScroll = containerRef.current.scrollHeight > containerRef.current.clientHeight;
+      console.log("Scrolling:", {
+        scrollHeight: containerRef.current.scrollHeight,
+        clientHeight: containerRef.current.clientHeight,
+        shouldScroll: shouldScroll
+      });
+      
+      if (shouldScroll) {
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Small delay to ensure DOM is fully rendered
+    const timer = setTimeout(() => {
+      scrollToBottom();
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, [messages, isLoading]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50">
-
+    <div 
+      ref={containerRef}
+      className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50"
+      style={{ 
+        overflowY: "auto",
+        scrollBehavior: "smooth"
+      }}
+    >
       <div className="max-w-3xl mx-auto space-y-6">
-
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -14,7 +45,6 @@ const MessageList = ({ messages, isLoading }) => {
               msg.sender === "user" ? "justify-end" : "justify-start"
             }`}
           >
-
             <div
               className={`
                 max-w-[70%] px-4 py-3 rounded-2xl shadow-sm
@@ -27,11 +57,9 @@ const MessageList = ({ messages, isLoading }) => {
             >
               {msg.text}
             </div>
-
           </div>
         ))}
 
-        {/* Typing indicator */}
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-white border px-4 py-2 rounded-xl text-gray-500">
@@ -39,9 +67,8 @@ const MessageList = ({ messages, isLoading }) => {
             </div>
           </div>
         )}
-
+        
       </div>
-
     </div>
   );
 };

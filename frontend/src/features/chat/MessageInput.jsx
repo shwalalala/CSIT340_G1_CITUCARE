@@ -1,14 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Send, Paperclip } from "lucide-react";
 
 const MessageInput = ({ onSendMessage, disabled = false }) => {
   const [input, setInput] = useState(""); // Remove <string> type annotation
+  const inputRef = useRef(null);
+
+  // Auto-focus when component mounts
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Auto-focus after message is sent (when disabled becomes false)
+  useEffect(() => {
+    if (!disabled) {
+      inputRef.current?.focus();
+    }
+  }, [disabled]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (input.trim()) {
       onSendMessage(input);
       setInput("");
+      // Keep focus after sending
+      inputRef.current?.focus();
     }
   };
 
@@ -19,6 +34,8 @@ const MessageInput = ({ onSendMessage, disabled = false }) => {
       if (input.trim()) {
         onSendMessage(input);
         setInput("");
+        // Keep focus after sending via Enter key
+        inputRef.current?.focus();
       }
     }
   };
@@ -38,6 +55,7 @@ const MessageInput = ({ onSendMessage, disabled = false }) => {
             </button>
 
             <input
+              ref={inputRef} // Add this ref to the input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}

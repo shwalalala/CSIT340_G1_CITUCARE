@@ -5,7 +5,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
+<<<<<<< HEAD
 		<version>3.5.13</version>
+=======
+		<version>3.5.8</version>
+>>>>>>> origin/main
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.appdev.powerpuff</groupId>

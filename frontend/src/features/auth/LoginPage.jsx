@@ -92,21 +92,13 @@ const LoginPage = () => {
 
         {/* Forgot Password */}
         <div className="mt-6 text-center">
-<<<<<<< HEAD
-          <button
-=======
           {/* <button
->>>>>>> origin/main
             type="button"
             onClick={() => alert("Forgot password feature coming soon.")}
             className="text-gray-900 underline hover:text-red-700 transition"
           >
             Forgot password?
-<<<<<<< HEAD
-          </button>
-=======
           </button> */}
->>>>>>> origin/main
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const RegisterPage: React.FC = () => {
+const RegisterPage = () => {
 
   const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ const RegisterPage: React.FC = () => {
 
   const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value

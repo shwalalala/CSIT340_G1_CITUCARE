@@ -254,41 +254,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
               <h2 className="text-xl font-semibold mb-6">
                 Account
               </h2>
-
-              {/* PROFILE PHOTO */}
-
-              <div className="mb-8">
-
-                <label className="block font-medium mb-3">
-                  Profile Photo
-                </label>
-
-                <div className="flex items-center gap-6">
-
-                  <img
-                    src={profilePhoto}
-                    alt="Profile"
-                    className="w-20 h-20 rounded-full object-cover border"
-                  />
-
-                  {isEditingProfile && (
-                    <div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoUpload}
-                        className="text-sm"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        JPG or PNG recommended
-                      </p>
-                    </div>
-                  )}
-
-                </div>
-
-              </div>
-
+              
               {/* FULL NAME */}
 
               <div className="mb-4">

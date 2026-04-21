@@ -1,22 +1,19 @@
-// frontend/src/components/AdminComponents/UserManager.tsx
+// frontend/src/components/AdminComponents/UserManager.jsx
 
 import React, { useEffect, useState } from "react";
 import { Plus, Edit2, Trash2, AlertCircle, CheckCircle } from "lucide-react";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
 
-const getId = (obj) =>
-  obj.userId ?? obj.id;
+const getId = (obj) => obj.userId ?? obj.id;
 
 const UserManager = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
@@ -26,6 +23,7 @@ const UserManager = () => {
     email: "",
     password: "",
     departmentId: "",
+    institutionalId: ""
   });
 
   useEffect(() => {
@@ -67,11 +65,12 @@ const UserManager = () => {
         "";
 
       setFormData({
-        fname: user.fname ?? "",
-        lname: user.lname ?? "",
-        email: user.email ?? "",
+        fname: user.fname || "",
+        lname: user.lname || "",
+        email: user.email || "",
         password: "",
         departmentId: deptId ? String(deptId) : "",
+        institutionalId: user.institutionalId || ""
       });
     } else {
       setEditingId(null);
@@ -82,6 +81,7 @@ const UserManager = () => {
         email: "",
         password: "",
         departmentId: "",
+        institutionalId: ""
       });
     }
 
@@ -99,31 +99,40 @@ const UserManager = () => {
     setError(null);
     setSuccess(null);
 
-    if (!formData.fname || !formData.lname || !formData.email) {
+    // Safe check for form fields with fallback to empty string
+    const fname = formData.fname || "";
+    const lname = formData.lname || "";
+    const email = formData.email || "";
+    const institutionalId = formData.institutionalId || "";
+    const password = formData.password || "";
+    const departmentId = formData.departmentId || "";
+
+    if (!fname || !lname || !email) {
       setError("Name and Email are required");
       return;
     }
 
-    if (!formData.departmentId) {
+    if (!departmentId) {
       setError("Department is required");
       return;
     }
 
-    if (!editingId && !formData.password) {
+    if (!editingId && !password) {
       setError("Password is required");
       return;
     }
 
     const payload = {
-      fname: formData.fname.trim(),
-      lname: formData.lname.trim(),
-      email: formData.email.trim(),
+      fname: fname.trim(),
+      lname: lname.trim(),
+      email: email.trim(),
+      institutionalId: institutionalId.trim(),
       role: "ADMIN",
-      department: { departmentId: Number(formData.departmentId) },
+      department: { departmentId: Number(departmentId) }
     };
 
-    if (formData.password) {
-      payload.password = formData.password;
+    if (password) {
+      payload.password = password;
     }
 
     try {
@@ -164,7 +173,6 @@ const UserManager = () => {
 
   return (
     <div className="space-y-6">
-
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -198,14 +206,12 @@ const UserManager = () => {
 
       {/* Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
-
         {loading ? (
           <div className="p-8 text-center">Loading users...</div>
         ) : users.length === 0 ? (
           <div className="p-8 text-center">No users yet</div>
         ) : (
           <table className="w-full">
-
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-6 py-3 text-left">Name</th>
@@ -217,10 +223,8 @@ const UserManager = () => {
             </thead>
 
             <tbody className="divide-y">
-
               {users.map((user) => (
                 <tr key={String(getId(user))}>
-
                   <td className="px-6 py-4">
                     {user.fname} {user.lname}
                   </td>
@@ -238,7 +242,6 @@ const UserManager = () => {
                   </td>
 
                   <td className="px-6 py-4 text-right">
-
                     <button
                       onClick={() => handleOpenModal(user)}
                       className="p-2 text-red-700 hover:bg-red-50 rounded-lg"
@@ -252,15 +255,12 @@ const UserManager = () => {
                     >
                       <Trash2 size={18} />
                     </button>
-
                   </td>
                 </tr>
               ))}
-
             </tbody>
           </table>
         )}
-
       </div>
 
       {showModal && (
@@ -285,42 +285,47 @@ const UserModal = ({
   isEditing,
   departments
 }) => {
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value || ""
+    }));
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-
       <div className="bg-white p-6 rounded-lg w-full max-w-md">
-
         <h3 className="text-lg font-bold mb-4">
           {isEditing ? "Edit Admin" : "Create Admin"}
         </h3>
 
         <form onSubmit={onSubmit} className="space-y-4">
-
           <input
             placeholder="First Name"
-            value={formData.fname}
-            onChange={(e) =>
-              setFormData((p) => ({ ...p, fname: e.target.value }))
-            }
+            value={formData.fname || ""}
+            onChange={(e) => handleChange("fname", e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
 
           <input
             placeholder="Last Name"
-            value={formData.lname}
-            onChange={(e) =>
-              setFormData((p) => ({ ...p, lname: e.target.value }))
-            }
+            value={formData.lname || ""}
+            onChange={(e) => handleChange("lname", e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
 
           <input
             placeholder="Email"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData((p) => ({ ...p, email: e.target.value }))
-            }
+            type="email"
+            value={formData.email || ""}
+            onChange={(e) => handleChange("email", e.target.value)}
+            className="w-full border px-3 py-2 rounded"
+          />
+
+          <input
+            placeholder="Institutional ID"
+            value={formData.institutionalId || ""}
+            onChange={(e) => handleChange("institutionalId", e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
 
@@ -328,23 +333,18 @@ const UserModal = ({
             <input
               type="password"
               placeholder="Password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData((p) => ({ ...p, password: e.target.value }))
-              }
+              value={formData.password || ""}
+              onChange={(e) => handleChange("password", e.target.value)}
               className="w-full border px-3 py-2 rounded"
             />
           )}
 
           <select
-            value={formData.departmentId}
-            onChange={(e) =>
-              setFormData((p) => ({ ...p, departmentId: e.target.value }))
-            }
+            value={formData.departmentId || ""}
+            onChange={(e) => handleChange("departmentId", e.target.value)}
             className="w-full border px-3 py-2 rounded"
           >
             <option value="">Select Department</option>
-
             {departments.map((d) => {
               const id = d.departmentId ?? d.id;
               return (
@@ -356,7 +356,6 @@ const UserModal = ({
           </select>
 
           <div className="flex gap-3 pt-3">
-
             <button
               type="button"
               onClick={onClose}
@@ -371,9 +370,7 @@ const UserModal = ({
             >
               {isEditing ? "Update" : "Create"}
             </button>
-
           </div>
-
         </form>
       </div>
     </div>

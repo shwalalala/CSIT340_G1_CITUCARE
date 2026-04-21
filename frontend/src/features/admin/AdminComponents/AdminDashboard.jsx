@@ -160,14 +160,14 @@ const normalizeKbRow = (row) => ({
         setKbPublished(publishedCount);
         setKbDraft(draftCount);
 
-        // sort by created/updated date desc
+        // sort by created/updated date desc and take only 4 most recent
         const sorted = [...normalized].sort((a, b) => {
           const da = new Date(a.createdAt || a.updatedAt || 0).getTime();
           const db = new Date(b.createdAt || b.updatedAt || 0).getTime();
           return db - da;
         });
 
-        setKbRecent(sorted.slice(0, 5));
+        setKbRecent(sorted.slice(0, 4));
       })
       .catch(() => {
         if (!mounted) return;
@@ -202,7 +202,7 @@ const stats = [
     {
       title: 'Categories',
       value: categoriesCount == null ? '…' : categoriesCount,
-      subtitle: '',
+      subtitle: categoriesCount > 0 ? `${categoriesCount} total categories` : '',
       icon: Layers,
       color: 'bg-amber-50',
       textColor: 'text-amber-600',
@@ -227,29 +227,29 @@ const stats = [
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="h-full flex flex-col space-y-6">
+      {/* Stats Grid - More compact */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white rounded-lg shadow p-6">
+            <div key={index} className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm font-medium">
+                  <p className="text-gray-500 text-xs font-medium">
                     {stat.title}
                   </p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
                     {stat.value}
                   </p>
                   {stat.subtitle && (
-                    <p className="text-sm text-green-600 mt-2">
+                    <p className="text-xs text-green-600 mt-1">
                       {stat.subtitle}
                     </p>
                   )}
                 </div>
-                <div className={`${stat.color} p-4 rounded-lg`}>
-                  <Icon size={24} className={stat.textColor} />
+                <div className={`${stat.color} p-2 rounded-lg`}>
+                  <Icon size={20} className={stat.textColor} />
                 </div>
               </div>
             </div>
@@ -257,120 +257,124 @@ const stats = [
         })}
       </div>
 
-      {/* Content Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Content Row - Flexible height to fill remaining space */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         {/* Recent KB Activity */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
+        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6 flex flex-col min-h-0">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex-shrink-0">
             Recent Knowledge Base Activity
           </h2>
 
-          {kbRecent.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No knowledge base activity yet.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {kbRecent.map((kb) => (
-                <div
-                  key={kb.kbId}
-                  className="flex items-center justify-between py-3 border-b last:border-b-0 border-gray-200"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700">
-                      📝
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {kbRecent.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No knowledge base activity yet.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {kbRecent.map((kb) => (
+                  <div
+                    key={kb.kbId}
+                    className="flex items-center justify-between py-3 border-b last:border-b-0 border-gray-200"
+                  >
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 flex-shrink-0">
+                        📝
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 truncate">{kb.title}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Category:{' '}
+                          <span className="font-medium">
+                            {kb.category?.categoryName || kb.category?.name || '—'}
+                          </span>{' '}
+                          · Dept:{' '}
+                          <span className="font-medium">
+                            {kb.department?.deptName || kb.department?.name || '—'}
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1 truncate">
+                          Q:{' '}
+                          {(kb.questionPattern || '')
+                            .toString()
+                            .slice(0, 80)}
+                          {kb.questionPattern &&
+                            kb.questionPattern.length > 80 &&
+                            '…'}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{kb.title}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Category:{' '}
-                        <span className="font-medium">
-                          {kb.category?.categoryName || kb.category?.name || '—'}
-                        </span>{' '}
-                        · Dept:{' '}
-                        <span className="font-medium">
-                          {kb.department?.deptName || kb.department?.name || '—'}
-                        </span>
+                    <div className="text-right flex-shrink-0 ml-4">
+                      <p className="text-xs text-gray-400">
+                        {formatDate({
+                          createdAt: kb.createdAt,
+                          updatedAt: kb.updatedAt,
+                        })}
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Q:{' '}
-                        {(kb.questionPattern || '')
-                          .toString()
-                          .slice(0, 80)}
-                        {kb.questionPattern &&
-                          kb.questionPattern.length > 80 &&
-                          '…'}
-                      </p>
+                      <span
+                        className={`mt-1 inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                          kb.isPublished
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}
+                      >
+                        {kb.isPublished ? 'Published' : 'Draft'}
+                      </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400">
-                      {formatDate({
-                        createdAt: kb.createdAt,
-                        updatedAt: kb.updatedAt,
-                      })}
-                    </p>
-                    <span
-                      className={`mt-1 inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                        kb.isPublished
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}
-                    >
-                      {kb.isPublished ? 'Published' : 'Draft'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Stats</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Status</span>
-              <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
-                Active
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-              <span className="text-gray-600">KB Published Ratio</span>
-              <span className="text-gray-900 font-medium">
-                {kbPublishedRatio}%
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-              <span className="text-gray-600">Categories</span>
-              <span className="text-gray-900 font-medium">
-                {categoriesCount ?? 0}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-              <span className="text-gray-600">Admin Users</span>
-              <span className="text-gray-900 font-medium">
-                {usersCount ?? 0}
-              </span>
-            </div>
-
-            {adminUser && (
-              <div className="pt-4 border-t border-gray-200 text-xs text-gray-500">
-                Logged in as{' '}
-                <span className="font-medium">
-                  {adminUser.fname} {adminUser.lname}
-                </span>{' '}
-                ({adminUser.role}
-                {adminUser.departmentName
-                  ? ` · Dept: ${adminUser.departmentName}`
-                  : ''}
-                )
+        <div className="bg-white rounded-lg shadow p-6 flex flex-col min-h-0">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex-shrink-0">Quick Stats</h2>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Status</span>
+                <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+                  Active
+                </span>
               </div>
-            )}
+
+              <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                <span className="text-gray-600">KB Published Ratio</span>
+                <span className="text-gray-900 font-medium">
+                  {kbPublishedRatio}%
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                <span className="text-gray-600">Categories</span>
+                <span className="text-gray-900 font-medium">
+                  {categoriesCount ?? 0}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                <span className="text-gray-600">Admin Users</span>
+                <span className="text-gray-900 font-medium">
+                  {usersCount ?? 0}
+                </span>
+              </div>
+
+              {adminUser && (
+                <div className="pt-4 border-t border-gray-200 text-xs text-gray-500">
+                  Logged in as{' '}
+                  <span className="font-medium">
+                    {adminUser.fname} {adminUser.lname}
+                  </span>{' '}
+                  ({adminUser.role}
+                  {adminUser.departmentName
+                    ? ` · Dept: ${adminUser.departmentName}`
+                    : ''}
+                  )
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -68,12 +68,12 @@ const AdminHeader = ({ onMenuClick }) => {
           </div>
         </div>
 
-        <a
+        {/* <a
           href="/"
           className="px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 rounded-lg transition-colors"
         >
           ← Back to Chat
-        </a>
+        </a> */}
       </div>
     </header>
   );

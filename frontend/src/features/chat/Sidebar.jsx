@@ -53,9 +53,9 @@ const Sidebar = ({
         {chatHistory?.length > 0 && (
           <div className="flex-1 overflow-y-auto px-4 pb-2 min-h-0">
             <p className="text-xs font-semibold text-gray-400 mb-2">
-              RECENT CHATS
+              {/* RECENT CHATS */}
             </p>
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               {chatHistory.map((chat, i) => (
                 <button
                   key={i}
@@ -69,7 +69,7 @@ const Sidebar = ({
                   <span className="truncate">{chat.title}</span>
                 </button>
               ))}
-            </div>
+            </div> */}
           </div>
         )}
 
